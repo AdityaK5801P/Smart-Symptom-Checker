@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Symptom Checker - AI Health Assistant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .card-hover {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <header class="gradient-bg text-white py-8">
+        <div class="container mx-auto px-4 text-center">
+            <div class="flex justify-center mb-6">
+                <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center">
+                    <i class="fas fa-heartbeat text-4xl text-purple-600"></i>
+                </div>
+            </div>
+            <h1 class="text-4xl font-bold mb-4">Smart Symptom Checker</h1>
+            <p class="text-xl opacity-90">AI-powered health assessment with natural language understanding</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-12">
+        <div class="grid md:grid-cols-2 gap-8 mb-12">
+            <!-- Input Section -->
+            <div class="bg-white rounded-2xl shadow-xl p-8 card-hover">
+                <h2 class="text-2xl font-semibold mb-6 text-gray-800">Describe Your Symptoms</h2>
+                
+                <!-- Symptom Input -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-comment-medical mr-2"></i>Enter your symptoms in your own words:
+                    </label>
+                    <textarea 
+                        id="symptomInput" 
+                        class="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        rows="4"
+                        placeholder="Example: I've been having a headache and fever for the past 2 days, along with some nausea..."
+                    ></textarea>
+                </div>
+
+                <!-- Voice Input -->
+                <div class="mb-6">
+                    <button 
+                        id="voiceInputBtn" 
+                        class="w-full bg-blue-100 text-blue-700 py-3 px-4 rounded-lg hover:bg-blue-200 flex items-center justify-center"
+                    >
+                        <i class="fas fa-microphone mr-2"></i>
+                        <span id="voiceStatus">Start Voice Input</span>
+                    </button>
+                </div>
+
+                <!-- Additional Info -->
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Duration</label>
+                        <select id="duration" class="w-full p-3 border border-gray-300 rounded-lg">
+                            <option>Less than 1 day</option>
+                            <option>1-3 days</option>
+                            <option>4-7 days</option>
+                            <option>More than 1 week</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Severity</label>
+                        <select id="severity" class="w-full p-3 border border-gray-300 rounded-lg">
+                            <option>Mild</option>
+                            <option>Moderate</option>
+                            <option>Severe</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button 
+                    id="analyzeBtn" 
+                    class="w-full gradient-bg text-white py-4 px-6 rounded-lg font-semibold hover:opacity-90 pulse"
+                >
+                    <i class="fas fa-brain mr-2"></i>Analyze Symptoms with AI
+                </button>
+            </div>
+
+            <!-- Results Section -->
+            <div class="bg-white rounded-2xl shadow-xl p-8 card-hover">
+                <h2 class="text-2xl font-semibold mb-6 text-gray-800">Analysis Results</h2>
+                
+                <div id="results" class="space-y-6">
+                    <div class="text-center py-12 text-gray-400">
+                        <i class="fas fa-stethoscope text-4xl mb-4"></i>
+                        <p>Enter your symptoms to get AI-powered analysis</p>
+                    </div>
+                </div>
+
+                <!-- Health Tips Carousel -->
+                <div class="mt-8 bg-blue-50 rounded-lg p-6">
+                    <h3 class="font-semibold mb-4 text-blue-800">
+                        <i class="fas fa-lightbulb mr-2"></i>Health Tip of the Day
+                    </h3>
+                    <p class="text-blue-700">Staying hydrated and getting adequate rest can significantly improve your body's ability to fight off common illnesses.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Symptom History -->
+        <div class="bg-white rounded-2xl shadow-xl p-8 mb-12">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-semibold text-gray-800">
+                    <i class="fas fa-history mr-2"></i>Symptom History
+                </h2>
+                <button 
+                    id="clearHistoryBtn" 
+                    class="bg-red-100 text-red-700 py-2 px-4 rounded-lg hover:bg-red-200"
+                >
+                    <i class="fas fa-trash mr-2"></i>Clear History
+                </button>
+            </div>
+            
+            <div id="historyList" class="space-y-4">
+                <!-- History items will be populated here -->
+            </div>
+        </div>
+
+        <!-- Medical Illustration -->
+        <div class="bg-white rounded-2xl shadow-xl p-8 text-center">
+            <h2 class="text-2xl font-semibold mb-6 text-gray-800">How It Works</h2>
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-comment text-2xl text-blue-600"></i>
+                    </div>
+                    <h3 class="font-semibold mb-2">Describe Symptoms</h3>
+                    <p class="text-gray-600">Use natural language to describe how you're feeling</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-brain text-2xl text-green-600"></i>
+                    </div>
+                    <h3 class="font-semibold mb-2">AI Analysis</h3>
+                    <p class="text-gray-600">Our system analyzes your symptoms using advanced NLP</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-chart-line text-2xl text-purple-600"></i>
+                    </div>
+                    <h3 class="font-semibold mb-2">Get Insights</h3>
+                    <p class="text-gray-600">Receive personalized health guidance and recommendations</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-12 mt-12">
+        <div class="container mx-auto px-4 text-center">
+            <div class="mb-6">
+                <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto">
+                    <i class="fas fa-shield-alt text-2xl text-gray-800"></i>
+                </div>
+            </div>
+            <p class="text-lg mb-4">Your health data is always secure and private</p>
+            <p class="text-gray-400">This tool is for informational purposes only and not a substitute for professional medical advice</p>
+            <div class="mt-6">
+                <button class="bg-blue-600 text-white py-2 px-6 rounded-lg hover:bg-blue-700">
+                    <i class="fas fa-info-circle mr-2"></i>Emergency Contact
+                </button>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Medical knowledge base - simulated AI responses
+        const medicalKnowledge = {
+            'headache': {
+                causes: ['Tension', 'Dehydration', 'Migraine', 'Sinus infection', 'Eye strain'],
+                guidance: ['Rest in a quiet, dark room', 'Stay hydrated', 'Apply cold compress to forehead', 'Consider over-the-counter pain relief'],
+                recommendation: 'Consult doctor if severe, persistent, or accompanied by other symptoms'
+            },
+            'fever': {
+                causes: ['Viral infection', 'Bacterial infection', 'Inflammatory conditions', 'Heat exhaustion'],
+                guidance: ['Stay hydrated', 'Rest', 'Use fever-reducing medication if needed', 'Monitor temperature regularly'],
+                recommendation: 'Seek medical attention if fever is high (>103°F/39.4°C) or lasts more than 3 days'
+            },
+            'cough': {
+                causes: ['Common cold', 'Allergies', 'Bronchitis', 'Asthma', 'Post-nasal drip'],
+                guidance: ['Stay hydrated with warm liquids', 'Use humidifier', 'Avoid irritants like smoke', 'Consider cough drops'],
+                recommendation: 'See doctor if cough persists more than 2 weeks or is accompanied by breathing difficulties'
+            },
+            'nausea': {
+                causes: ['Viral infection', 'Food poisoning', 'Motion sickness', 'Pregnancy', 'Medication side effects'],
+                guidance: ['Eat small, bland meals', 'Stay hydrated with clear fluids', 'Avoid strong odors', 'Ginger tea may help'],
+                recommendation: 'Seek medical help if accompanied by severe pain, vomiting, or dehydration signs'
+            },
+            'fatigue': {
+                causes: ['Lack of sleep', 'Stress', 'Anemia', 'Thyroid issues', 'Chronic fatigue syndrome'],
+                guidance: ['Maintain regular sleep schedule', 'Stay physically active', 'Eat balanced diet', 'Manage stress'],
+                recommendation: 'Consult doctor if fatigue is persistent and affecting daily life'
+            }
+        };
+
+        // DOM Elements
+        const symptomInput = document.getElementById('symptomInput');
+        const voiceInputBtn = document.getElementById('voiceInputBtn');
+        const voiceStatus = document.getElementById('voiceStatus');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const resultsDiv = document.getElementById('results');
+        const historyList = document.getElementById('historyList');
+        const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+        const durationSelect = document.getElementById('duration');
+        const severitySelect = document.getElementById('severity');
+
+        // Speech Recognition
+        let recognition = null;
+        let isListening = false;
+
+        // Initialize Speech Recognition if available
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'en-US';
+
+            recognition.onstart = () => {
+                isListening = true;
+                voiceStatus.textContent = 'Listening...';
+                voiceInputBtn.classList.add('bg-red-100', 'text-red-700');
+            };
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                symptomInput.value = transcript;
+                isListening = false;
+                voiceStatus.textContent = 'Start Voice Input';
+                voiceInputBtn.classList.remove('bg-red-100', 'text-red-700');
+            };
+
+            recognition.onerror = () => {
+                isListening = false;
+                voiceStatus.textContent = 'Start Voice Input';
+                voiceInputBtn.classList.remove('bg-red-100', 'text-red-700');
+                alert('Voice recognition error. Please try again.');
+            };
+
+            recognition.onend = () => {
+                isListening = false;
+                voiceStatus.textContent = 'Start Voice Input';
+                voiceInputBtn.classList.remove('bg-red-100', 'text-red-700');
+            };
+        } else {
+            voiceInputBtn.disabled = true;
+            voiceStatus.textContent = 'Voice Input Not Supported';
+        }
+
+        // Event Listeners
+        voiceInputBtn.addEventListener('click', () => {
+            if (recognition) {
+                if (!isListening) {
+                    recognition.start();
+                } else {
+                    recognition.stop();
+                }
+            }
+        });
+
+        analyzeBtn.addEventListener('click', analyzeSymptoms);
+        clearHistoryBtn.addEventListener('click', clearHistory);
+
+        // Load history on page load
+        loadHistory();
+
+        // Functions
+        function analyzeSymptoms() {
+            const symptoms = symptomInput.value.trim().toLowerCase();
+            if (!symptoms) {
+                alert('Please describe your symptoms first.');
+                return;
+            }
+
+            const duration = durationSelect.value;
+            const severity = severitySelect.value;
+
+            // Simulate AI processing with loading state
+            analyzeBtn.disabled = true;
+            analyzeBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Analyzing...';
+
+            setTimeout(() => {
+                const analysis = generateAnalysis(symptoms, duration, severity);
+                displayResults(analysis);
+                saveToHistory(symptoms, analysis);
+                analyzeBtn.disabled = false;
+                analyzeBtn.innerHTML = '<i class="fas fa-brain mr-2"></i>Analyze Symptoms with AI';
+            }, 2000);
+        }
+
+        function generateAnalysis(symptoms, duration, severity) {
+            // Simple NLP simulation - extract key symptoms
+            const detectedSymptoms = [];
+            for (const symptom in medicalKnowledge) {
+                if (symptoms.includes(symptom)) {
+                    detectedSymptoms.push(symptom);
+                }
+            }
+
+            // Generate analysis based on detected symptoms
+            let analysis = {
+                possibleConditions: [],
+                guidance: [],
+                recommendation: 'Monitor your symptoms and consider consulting a healthcare professional if they persist or worsen.'
+            };
+
+            detectedSymptoms.forEach(symptom => {
+                const info = medicalKnowledge[symptom];
+                analysis.possibleConditions.push(...info.causes);
+                analysis.guidance.push(...info.guidance);
+            });
+
+            // Remove duplicates and limit results
+            analysis.possibleConditions = [...new Set(analysis.possibleConditions)].slice(0, 5);
+            analysis.guidance = [...new Set(analysis.guidance)].slice(0, 4);
+
+            // Adjust based on severity and duration
+            if (severity === 'Severe' || duration === 'More than 1 week') {
+                analysis.recommendation = 'Please consult a healthcare professional promptly for proper evaluation and treatment.';
+            }
+
+            return analysis;
+        }
+
+        function displayResults(analysis) {
+            resultsDiv.innerHTML = `
+                <div class="fade-in">
+                    <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
+                        <h3 class="font-semibold text-blue-800 mb-2">
+                            <i class="fas fa-info-circle mr-2"></i>Analysis Complete
+                        </h3>
+                        <p class="text-blue-700">Based on your symptoms and our AI analysis</p>
+                    </div>
+
+                    <div class="mb-6">
+                        <h4 class="font-semibold text-gray-800 mb-3 flex items-center">
+                            <i class="fas fa-diagnoses mr-2 text-purple-600"></i>Possible Causes
+                        </h4>
+                        <ul class="list-disc list-inside space-y-1 text-gray-700">
+                            ${analysis.possibleConditions.map(cause => `<li>${cause}</li>`).join('')}
+                        </ul>
+                    </div>
+
+                    <div class="mb-6">
+                        <h4 class="font-semibold text-gray-800 mb-3 flex items-center">
+                            <i class="fas fa-hands-helping mr-2 text-green-600"></i>Self-Care Guidance
+                        </h4>
+                        <ul class="list-disc list-inside space-y-1 text-gray-700">
+                            ${analysis.guidance.map(guide => `<li>${guide}</li>`).join('')}
+                        </ul>
+                    </div>
+
+                    <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4">
+                        <h4 class="font-semibold text-yellow-800 mb-2 flex items-center">
+                            <i class="fas fa-exclamation-triangle mr-2"></i>Recommendation
+                        </h4>
+                        <p class="text-yellow-700">${analysis.recommendation}</p>
+                    </div>
+
+                    <div class="mt-6 text-center">
+                        <button class="bg-green-600 text-white py-2 px-6 rounded-lg hover:bg-green-700">
+                            <i class="fas fa-calendar-check mr-2"></i>Schedule Doctor Appointment
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function saveToHistory(symptoms, analysis) {
+            const history = JSON.parse(localStorage.getItem('symptomHistory') || '[]');
+            const entry = {
+                id: Date.now(),
+                symptoms,
+                analysis,
+                timestamp: new Date().toLocaleString()
+            };
+            history.unshift(entry);
+            localStorage.setItem('symptomHistory', JSON.stringify(history));
+            loadHistory();
+        }
+
+        function loadHistory() {
+            const history = JSON.parse(localStorage.getItem('symptomHistory') || '[]');
+            historyList.innerHTML = '';
+
+            if (history.length === 0) {
+                historyList.innerHTML = `
+                    <div class="text-center py-8 text-gray-400">
+                        <i class="fas fa-history text-3xl mb-3"></i>
+                        <p>No symptom history yet</p>
+                    </div>
+                `;
+                return;
+            }
+
+            history.forEach(entry => {
+                const div = document.createElement('div');
+                div.className = 'bg-gray-50 p-4 rounded-lg fade-in';
+                div.innerHTML = `
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-sm text-gray-500">${entry.timestamp}</span>
+                        <button onclick="deleteHistoryEntry(${entry.id})" class="text-red-500 hover:text-red-700">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <p class="font-semibold text-gray-800 mb-2">${entry.symptoms}</p>
+                    <p class="text-sm text-gray-600">${entry.analysis.possibleConditions.slice(0, 2).join(', ')}...</p>
+                `;
+                div.addEventListener('click', () => viewHistoryEntry(entry));
+                historyList.appendChild(div);
+            });
+        }
+
+        function viewHistoryEntry(entry) {
+            symptomInput.value = entry.symptoms;
+            displayResults(entry.analysis);
+        }
+
+        function deleteHistoryEntry(id) {
+            event.stopPropagation();
+            const history = JSON.parse(localStorage.getItem('symptomHistory') || '[]');
+            const filtered = history.filter(entry => entry.id !== id);
+            localStorage.setItem('symptomHistory', JSON.stringify(filtered));
+            loadHistory();
+        }
+
+        function clearHistory() {
+            if (confirm('Are you sure you want to clear all symptom history?')) {
+                localStorage.removeItem('symptomHistory');
+                loadHistory();
+            }
+        }
+
+        // Make functions available globally for onclick handlers
+        window.deleteHistoryEntry = deleteHistoryEntry;
+    </script>
+</body>
+</html>
+
+```
